@@ -36,8 +36,8 @@ publish {
     repoName="ktx"
     artifactId = "ktx"
     publishVersion = "${version}"
-    desc = 'Simple and fantastic wheel view in realistic effect for android.'
-    website = 'https://github.com/AigeStudio/WheelPicker'
+    desc = 'some useful kotlin extension.'
+    website = 'https://github.com/liaobushi520/extensions'
 }
 
 
