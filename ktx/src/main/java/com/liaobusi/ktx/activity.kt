@@ -4,6 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.view.Menu
+import android.view.MenuItem
+import androidx.core.view.size
 import androidx.fragment.app.FragmentActivity
 
 fun FragmentActivity.startActivityForResult(
@@ -40,6 +43,18 @@ fun Context.getActivity(): Activity {
         context = context.baseContext;
     }
     throw  IllegalStateException("The Context is not an Activity.");
+}
+
+
+
+fun Activity.optionsMenu(resId: Int, menu: Menu?, init: Menu.() -> Unit): Boolean {
+    this.menuInflater.inflate(resId, menu)
+    menu?.init()
+    return (menu?.size ?: 0) > 0
+}
+
+fun Menu.onMenuClick(id: Int, callback: (item: MenuItem) -> Boolean) {
+    this.findItem(id)?.setOnMenuItemClickListener { callback(it) }
 }
 
 
