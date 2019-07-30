@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id"
+          name="state_tag"/>
+    <item type="id"
+          name="state_loading_tag"/>
+    <item type="id"
+          name="state_error_tag"/>
+    <item type="id"
+          name="state_completed_tag"/>
+</resources>
