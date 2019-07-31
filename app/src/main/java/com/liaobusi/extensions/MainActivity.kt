@@ -2,7 +2,9 @@ package com.liaobusi.extensions
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.liaobusi.ktx.*
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -13,11 +15,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val lp=(btn.layoutParams as ConstraintLayout.LayoutParams)
+
+        Log.e("LP",lp.leftToLeft.toString()+"")
         btn.setOnClickListener {
+            val handler = FragmentReplaceHandler(R.id.container, supportFragmentManager)
 
-            it.loadingHandler = LoadingDialogHandler()//LoadingViewHandler(this, attachToRootView = true)
+            it.loadingHandler = handler//LoadingDialogHandler()//LoadingViewHandler(this, attachToRootView = true)
 
-            it.completedHandler = ToastHandler()
+            it.completedHandler = handler
+
+            it.errorHandler = handler
 
             Thread {
                 it.postState(Loading("加载中..."))
