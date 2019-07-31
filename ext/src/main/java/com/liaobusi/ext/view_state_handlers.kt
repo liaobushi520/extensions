@@ -19,7 +19,6 @@ import com.liaobusi.ktx.*
 class ToastHandler : CompletedHandler, ErrorHandler, LoadingHandler {
 
 
-
     override fun onLoading(view: View, loading: Loading): Boolean {
         Toast.makeText(view.context, loading.message, Toast.LENGTH_SHORT).show()
         return false
@@ -78,16 +77,23 @@ class ViewEnableHandler : CompletedHandler, ErrorHandler, LoadingHandler {
     }
 }
 
-private class ReplaceFragment(retry: (() -> Unit)? = null) : Fragment() {
+private class ReplaceFragment(
+    private val layoutId: Int = R.layout.fragment_replace,
+    private val retry: (() -> Unit)? = null
+) : Fragment() {
 
     var progressView: View? = null
 
     var errorView: View? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_replace, container, false)
+        val root = inflater.inflate(layoutId, container, false)
         progressView = root.findViewById(R.id.progressView)
         errorView = root.findViewById(R.id.errorView)
+        val retryBtn = root.findViewById<View>(R.id.retryBtn)
+        retryBtn.setOnClickListener {
+            retry?.invoke()
+        }
         return root
     }
 
@@ -108,20 +114,36 @@ private class ReplaceFragment(retry: (() -> Unit)? = null) : Fragment() {
 
 
 class FragmentReplaceHandler(
-    containerId: Int,
     private val parentFragmentManager: FragmentManager,
-    retry: (() -> Unit)? = null
-) :
-    CompletedHandler, ErrorHandler,
-    LoadingHandler {
+    private val containerId: Int? = null,
+    private val layoutId: Int = R.layout.fragment_replace,
+    private val retry: (() -> Unit)? = null
+) : CompletedHandler, ErrorHandler, LoadingHandler {
 
-    private val replaceFragment: ReplaceFragment = ReplaceFragment(retry)
+    private lateinit var replaceFragment: ReplaceFragment
 
-    init {
-        parentFragmentManager.beginTransaction().add(containerId, replaceFragment).hide(replaceFragment).commitNow()
+    private fun ensureAttachToParent(view: View) {
+        if (!this::replaceFragment.isInitialized) {
+            replaceFragment = ReplaceFragment(layoutId, retry = retry)
+        }
+        if (!replaceFragment.isAdded) {
+            val containerId = if (containerId == null) {
+                containerId
+            } else {
+                findRootFrameLayout(view)?.id
+            }
+            if (containerId == null) {
+                throw IllegalStateException("containerId is null ,so we find root view.but not found")
+            } else {
+                parentFragmentManager.beginTransaction().add(containerId, replaceFragment).hide(replaceFragment)
+                    .commitNow()
+            }
+        }
     }
 
+
     override fun onLoading(view: View, loading: Loading): Boolean {
+        ensureAttachToParent(view)
         if (replaceFragment.isHidden) {
             parentFragmentManager.beginTransaction().show(replaceFragment).commitNow()
         }
@@ -132,6 +154,7 @@ class FragmentReplaceHandler(
     override fun dismissLoading() {}
 
     override fun onError(view: View, error: Error): Boolean {
+        ensureAttachToParent(view)
         if (replaceFragment.isHidden) {
             parentFragmentManager.beginTransaction().show(replaceFragment).commitNow()
         }
@@ -145,6 +168,7 @@ class FragmentReplaceHandler(
     }
 
     override fun onCompleted(view: View, completed: Completed): Boolean {
+        ensureAttachToParent(view)
         parentFragmentManager.beginTransaction().hide(replaceFragment).commitNow()
         return false
     }
@@ -165,7 +189,7 @@ class ErrorViewHandler(
             root = findRootFrameLayout(view) as FrameLayout
         } else {
             if (view !is ViewGroup) {
-                throw IllegalStateException("view must be FrameLayout or ConstraintLayout")
+                throw IllegalStateException("view must be ViewGroup")
             }
             root = view
         }
@@ -186,6 +210,9 @@ class ErrorViewHandler(
                     ConstraintLayout.LayoutParams.MATCH_PARENT
                 )
                 root.addView(errorView, lp)
+            }
+            else -> {
+                throw IllegalStateException("view must be FrameLayout or ConstraintLayout")
             }
 
         }
@@ -226,7 +253,7 @@ class LoadingViewHandler(context: Context, private val attachToRootView: Boolean
 
     override fun onLoading(view: View, loading: Loading): Boolean {
 
-        var root: ViewGroup? = null
+        val root: ViewGroup?
         if (attachToRootView) {
             root = findRootFrameLayout(view) as FrameLayout
         } else {
@@ -268,9 +295,9 @@ class LoadingViewHandler(context: Context, private val attachToRootView: Boolean
 
 
 class ComposeHandler(
-    private val loadingHandlers: List<LoadingHandler>?,
-    private val completedHandlers: List<CompletedHandler>?,
-    private val errorHandlers: List<ErrorHandler>?
+    private val loadingHandlers: List<LoadingHandler>? = null,
+    private val completedHandlers: List<CompletedHandler>? = null,
+    private val errorHandlers: List<ErrorHandler>? = null
 ) : LoadingHandler, CompletedHandler,
     ErrorHandler {
     override fun onLoading(view: View, loading: Loading): Boolean {
