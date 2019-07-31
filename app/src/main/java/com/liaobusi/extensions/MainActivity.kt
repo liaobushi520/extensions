@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.liaobusi.ext.FragmentReplaceHandler
 import com.liaobusi.ktx.*
 import kotlinx.android.synthetic.main.activity_main.*
 

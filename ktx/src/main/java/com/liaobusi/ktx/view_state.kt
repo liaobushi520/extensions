@@ -78,8 +78,6 @@ var View.completedHandler: CompletedHandler?
     }
 
 
-
-
 interface LoadingHandler {
 
     fun onLoading(view: View, loading: Loading): Boolean

@@ -1,4 +1,4 @@
-package com.liaobusi.ktx
+package com.liaobusi.ext
 
 import android.app.ProgressDialog
 import android.content.Context
@@ -13,8 +13,13 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.liaobusi.ktx.*
+
 
 class ToastHandler : CompletedHandler, ErrorHandler, LoadingHandler {
+
+
+
     override fun onLoading(view: View, loading: Loading): Boolean {
         Toast.makeText(view.context, loading.message, Toast.LENGTH_SHORT).show()
         return false
@@ -27,6 +32,7 @@ class ToastHandler : CompletedHandler, ErrorHandler, LoadingHandler {
         Toast.makeText(view.context, error.message, Toast.LENGTH_SHORT).show()
         return false
     }
+
 
     override fun dismissError() {
     }
@@ -42,6 +48,13 @@ class ToastHandler : CompletedHandler, ErrorHandler, LoadingHandler {
 }
 
 class ViewEnableHandler : CompletedHandler, ErrorHandler, LoadingHandler {
+
+
+    override fun onError(view: View, error: Error): Boolean {
+        view.isEnabled = true
+        return false
+    }
+
     override fun onLoading(view: View, loading: Loading): Boolean {
         view.isEnabled = false
         return false
@@ -50,10 +63,6 @@ class ViewEnableHandler : CompletedHandler, ErrorHandler, LoadingHandler {
     override fun dismissLoading() {
     }
 
-    override fun onError(view: View, error: Error): Boolean {
-        view.isEnabled = true
-        return false
-    }
 
     override fun dismissError() {
 
