@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
 
         Log.e("LP",lp.leftToLeft.toString()+"")
         btn.setOnClickListener {
-            val handler = FragmentReplaceHandler(R.id.container, supportFragmentManager)
+            val handler = FragmentReplaceHandler(supportFragmentManager )
 
             it.loadingHandler = handler//LoadingDialogHandler()//LoadingViewHandler(this, attachToRootView = true)
 

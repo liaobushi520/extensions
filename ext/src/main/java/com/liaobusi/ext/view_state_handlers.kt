@@ -3,6 +3,7 @@ package com.liaobusi.ext
 import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -127,17 +128,20 @@ class FragmentReplaceHandler(
             replaceFragment = ReplaceFragment(layoutId, retry = retry)
         }
         if (!replaceFragment.isAdded) {
-            val containerId = if (containerId == null) {
+            val containerId = if (containerId != null) {
                 containerId
             } else {
-                findRootFrameLayout(view)?.id
+                val root = findRootFrameLayout(view)
+                    ?: throw IllegalStateException("containerId is null ,so we find root view.but not found")
+                if (root.id == -1) {
+                    root.id = R.id.root_view
+                }
+                root.id
             }
-            if (containerId == null) {
-                throw IllegalStateException("containerId is null ,so we find root view.but not found")
-            } else {
-                parentFragmentManager.beginTransaction().add(containerId, replaceFragment).hide(replaceFragment)
-                    .commitNow()
-            }
+            parentFragmentManager.beginTransaction().add(containerId, replaceFragment, "replace_fragment")
+                .hide(replaceFragment)
+                .commitNow()
+
         }
     }
 
