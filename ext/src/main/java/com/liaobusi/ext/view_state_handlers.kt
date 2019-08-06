@@ -17,7 +17,23 @@ import androidx.fragment.app.FragmentManager
 import com.liaobusi.ktx.*
 
 
-class ToastHandler : CompletedHandler, ErrorHandler, LoadingHandler {
+open class HandlerAdapter : CompletedHandler, ErrorHandler, LoadingHandler {
+    override fun onLoading(view: View, loading: Loading) = false
+
+    override fun dismissLoading() {}
+
+    override fun onError(view: View, error: Error) = false
+
+    override fun dismissError() {}
+
+    override fun onCompleted(view: View, completed: Completed) = false
+
+    override fun dismissCompleted() {}
+
+}
+
+
+class ToastHandler : HandlerAdapter() {
 
 
     override fun onLoading(view: View, loading: Loading): Boolean {
@@ -47,7 +63,7 @@ class ToastHandler : CompletedHandler, ErrorHandler, LoadingHandler {
 
 }
 
-class ViewEnableHandler : CompletedHandler, ErrorHandler, LoadingHandler {
+class ViewEnableHandler : HandlerAdapter() {
 
 
     override fun onError(view: View, error: Error): Boolean {
@@ -119,7 +135,7 @@ class FragmentReplaceHandler(
     private val containerId: Int? = null,
     private val layoutId: Int = R.layout.fragment_replace,
     private val retry: (() -> Unit)? = null
-) : CompletedHandler, ErrorHandler, LoadingHandler {
+) : HandlerAdapter() {
 
     private lateinit var replaceFragment: ReplaceFragment
 
@@ -302,8 +318,7 @@ class ComposeHandler(
     private val loadingHandlers: List<LoadingHandler>? = null,
     private val completedHandlers: List<CompletedHandler>? = null,
     private val errorHandlers: List<ErrorHandler>? = null
-) : LoadingHandler, CompletedHandler,
-    ErrorHandler {
+) : HandlerAdapter() {
     override fun onLoading(view: View, loading: Loading): Boolean {
         if (!loadingHandlers.isNullOrEmpty()) {
             for (loadingHandler in loadingHandlers) {
